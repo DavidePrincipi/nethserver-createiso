@@ -58,10 +58,13 @@ EOF
     echo "bootloader --location=mbr " > /tmp/bootloader-include
 fi
 
-# enable dhcp on all network interfaces
-for net in `find /sys/class/net/ -mindepth 1 ! -name lo | cut -d '/' -f5`; do
-    echo "network --activate --onboot=yes --bootproto=dhcp --device=$net" --nameserver=8.8.8.8 >>/tmp/network-include
-done
+if [ -n "$bootproto" ]; then
+    for net in `find /sys/class/net/ -mindepth 1 ! -name lo | cut -d '/' -f5`; do
+        echo "network --activate --onboot=yes --bootproto=$bootproto --device=$net" >>/tmp/network-include
+    done
+else
+    echo "network --nameserver=8.8.8.8 --hostname=localhost.localdomain" >> /tmp/network-include
+fi
 
 # set encrypted fs
 if [ -z $fspassword ]; then

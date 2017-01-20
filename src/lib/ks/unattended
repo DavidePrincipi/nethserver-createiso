@@ -58,11 +58,11 @@ EOF
     echo "bootloader --location=mbr " > /tmp/bootloader-include
 fi
 
-# enable dhcp on all network interfaces
-for net in `find /sys/class/net/ -mindepth 1 ! -name lo | cut -d '/' -f5`; do
-    echo "network --activate --onboot=yes --bootproto=dhcp --device=$net" >>/tmp/network-include
-done
-echo "network --nameserver=8.8.8.8 --hostname=localhost.localdomain" >> /tmp/network-include
+if [ -n "$bootproto" ]; then
+    bootproto="--bootproto=$bootproto"
+fi
+echo "network --nameserver=8.8.8.8 --hostname=localhost.localdomain $bootproto" >> /tmp/network-include
+
 
 # set keyboard
 if [ -z $keyboard ]; then
